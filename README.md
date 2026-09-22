@@ -1,0 +1,90 @@
+# LCT 2026 Leaderboard MVP
+
+Минимальный каркас для варианта A: участники загружают готовый GeoJSON-результат,
+а система валидирует формат, пересчитывает базовые метрики и готовит данные для
+публичного лидерборда.
+
+## Быстрый запуск
+
+```powershell
+python -m lct_leaderboard.cli validate `
+  --catalog "C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/benchmark_specs/rule_catalog.json" `
+  --result "C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/benchmark_fixtures/new_tz_smoke/valid_result.geojson"
+```
+
+## Веб-борда локально
+
+```powershell
+$env:PYTHONPATH="src"
+$env:LCT_CATALOG_PATH="C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/benchmark_specs/rule_catalog.json"
+$env:LCT_INPUT_PATH="C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/benchmark_fixtures/new_tz_smoke/input.geojson"
+$env:LCT_SAMPLE_RESULT_PATH="C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/benchmark_fixtures/new_tz_smoke/valid_result.geojson"
+python -m lct_leaderboard.web
+```
+
+Открыть:
+
+```text
+http://localhost:8000
+```
+
+На странице доступны скачивания:
+
+- `/download/input` - входной датасет;
+- `/download/catalog` - каталог правил и ставок;
+- `/download/sample-result` - пример валидного результата, если задан `LCT_SAMPLE_RESULT_PATH`.
+
+## Публичный демо-доступ через Cloudflare Tunnel
+
+После запуска локальной борды:
+
+```powershell
+cloudflared tunnel --url http://localhost:8000
+```
+
+Cloudflare выдаст временный публичный URL. Это самый быстрый бесплатный способ
+показать демо без деплоя и без открытия входящих портов.
+
+## Render Free
+
+В репозитории есть `render.yaml`, а минимальные демо-файлы лежат в `demo_data/`.
+После пуша в GitHub можно создать Render Blueprint или Web Service из этого
+репозитория. Сервис стартует командой:
+
+```text
+python -m lct_leaderboard.web
+```
+
+Render Free подходит для демо, но не для постоянной боевой борды без внешней БД:
+free web service засыпает после простоя, а локальная файловая система может
+очищаться при рестартах/редеплоях.
+
+Импорт manifest из архива:
+
+```powershell
+python -m lct_leaderboard.cli import-scenes `
+  --manifest "C:\Users\igorv\Downloads\Telegram Desktop\heat_network_datasets_2026-09-21.zip!data/rl_large_smoke/scene_manifest.json" `
+  --out datasets.json
+```
+
+Поддерживаются обычные пути и zip-пути вида:
+
+```text
+archive.zip!path/inside/archive.json
+```
+
+## Что уже проверяет basic-верификатор
+
+- GeoJSON `FeatureCollection`;
+- обязательные поля `heat_network`, `heat_chamber`, `variant_summary`;
+- уникальность `properties.id`;
+- конечность чисел;
+- наличие диаметров в `pipe_catalog`;
+- пропускную способность трубы по `capacity_tph`;
+- пересчет длины LineString;
+- базовую стоимость новых участков;
+- стоимость камер;
+- штраф за неподключенные ОКС;
+- расхождения с заявленным `variant_summary`.
+
+Полные инженерные проверки геометрии будут добавлены отдельным слоем.

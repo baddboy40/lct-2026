@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lct-leaderboard
+    runtime: python
+    plan: free
+    buildCommand: "python --version"
+    startCommand: "python -m lct_leaderboard.web"
+    envVars:
+      - key: PYTHONPATH
+        value: src
+      - key: LCT_DATA_DIR
+        value: data
+      - key: LCT_CATALOG_PATH
+        value: demo_data/rule_catalog.json
+      - key: LCT_INPUT_PATH
+        value: demo_data/input.geojson
+      - key: LCT_SAMPLE_RESULT_PATH
+        value: demo_data/valid_result.geojson

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lct-leaderboard"
+version = "0.1.0"
+description = "MVP validator and scoring tools for heat-network leaderboard submissions."
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+lct-leaderboard = "lct_leaderboard.cli:main"
+lct-leaderboard-web = "lct_leaderboard.web:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
