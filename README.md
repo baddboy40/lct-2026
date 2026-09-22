@@ -55,6 +55,27 @@ Cloudflare выдаст временный публичный URL. Это сам
 python -m lct_leaderboard.web
 ```
 
+Быстрый ручной деплой:
+
+1. Открыть Render Dashboard.
+2. Нажать `New` -> `Blueprint`.
+3. Выбрать репозиторий `baddboy40/lct-2026`.
+4. Если Render спросит ветку, выбрать `develop`.
+5. Подтвердить создание сервиса `lct-leaderboard`.
+
+Если создавать не Blueprint, а обычный `Web Service`, параметры такие:
+
+- Branch: `develop`;
+- Runtime: `Python`;
+- Build Command: `python --version`;
+- Start Command: `python -m lct_leaderboard.web`;
+- Env:
+  - `PYTHONPATH=src`;
+  - `LCT_DATA_DIR=data`;
+  - `LCT_CATALOG_PATH=demo_data/rule_catalog.json`;
+  - `LCT_INPUT_PATH=demo_data/input.geojson`;
+  - `LCT_SAMPLE_RESULT_PATH=demo_data/valid_result.geojson`.
+
 Render Free подходит для демо, но не для постоянной боевой борды без внешней БД:
 free web service засыпает после простоя, а локальная файловая система может
 очищаться при рестартах/редеплоях.
